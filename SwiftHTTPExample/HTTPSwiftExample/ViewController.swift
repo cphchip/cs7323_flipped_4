@@ -44,6 +44,7 @@ class ViewController: UIViewController, ClientDelegate, UITextFieldDelegate {
     @IBOutlet weak var rightArrow: UILabel!
     @IBOutlet weak var downArrow: UILabel!
     @IBOutlet weak var leftArrow: UILabel!
+    //@IBOutlet weak var ipAddress: UITextField!
     @IBOutlet weak var ipTextField: UITextField!
     @IBOutlet weak var largeMotionMagnitude: UIProgressView!
     
@@ -92,7 +93,7 @@ class ViewController: UIViewController, ClientDelegate, UITextFieldDelegate {
     // Allow the user to change the IP via text field.
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if let ipText = ipTextField.text, !ipText.isEmpty {
-            client.setServerIp(ip: ipText)
+            _ = client.setServerIp(ip: ipText)
             print("IP set to ", client.server_ip)
         } else {
             print("New IP is nil or empty")
@@ -116,7 +117,16 @@ class ViewController: UIViewController, ClientDelegate, UITextFieldDelegate {
     @IBAction func makeModel(_ sender: AnyObject) {
         client.trainModel()
     }
-
+    @IBAction func getIPaddr(_ sender: UIButton) {
+        if let str_IpAddr = ipTextField.text {
+            _ = client.setServerIp(ip:str_IpAddr )
+            view.endEditing(true)
+        }
+        else {
+            print("IP addr field is empty or nil")
+        }
+    }
+    
 }
 
 //MARK: Protocol Required Functions

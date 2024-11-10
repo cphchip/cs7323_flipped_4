@@ -32,7 +32,7 @@ class MlaasModel: NSObject, URLSessionDelegate{
     // to see what your public facing IP address is
     
     // MARK: Flipped Assignment 4 update: Changed URL to my ip address
-    var server_ip = "192.168.1.42" // this will be the default ip
+    var server_ip = "192.168.1.135" // this will be the default ip
     // create a delegate for using the protocol
     var delegate:ClientDelegate?
     private var dsid:Int = 5
