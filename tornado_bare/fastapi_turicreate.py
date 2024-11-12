@@ -83,6 +83,7 @@ async def custom_lifespan(app: FastAPI):
     # Update app.clf to be a dictionary
     # app.clf = [] # start app with no classifier
     app.clf = {}
+    app.sk_clf = {}
 
     yield 
 
@@ -390,8 +391,10 @@ async def train_model_sklearn(dsid: int):
     # just write this to model files directory
     dump(model, '../models/sklearn_model_dsid%d.joblib'%(dsid))
 
-    # save this for use later 
-    app.clf = model 
+    # Flipped Module 4 Update: Section 3 step 11 part 1
+    # Update app.clf to be a dictionary
+    # app.clf = model 
+    app.sk_clf[dsid] = model
 
     return {"summary":f"KNN classifier with accuracy {acc}"}
 
@@ -409,17 +412,29 @@ async def predict_datapoint_sklearn(datapoint: FeatureDataPoint = Body(...)):
     # place inside an SFrame (that has one row)
     data = np.array(datapoint.feature).reshape((1,-1))
 
-    if(app.clf == []):
-        print("Loading Sklearn Model From file")
-        tmp = load('../models/sklearn_model_dsid%d.joblib'%(dsid)) 
-        app.clf = pickle.loads(tmp['model'])
+    # Flipped Module 4 Update: Section 3 step 12 part 1 and 2
+    # Updated to check if dsid exists, handle errors
+    # if(app.clf == {}):
+    if datapoint.dsid not in app.clf: # new if statement
+        print("Loading Turi Model From file for DSID: ", datapoint.dsid)
 
+        try:
+            # Try to set model equal to the correct model from the dictionary
+            model = tc.load('../models/sklearn_model_dsid%d.joblib'%(datapoint.dsid))
+            # Updated to use dictionary
+            app.sk_clf[datapoint.dsid] = model
+        except Exception as e:
+            raise HTTPException(
+                status_code = 404,
+                detail=f"Model for DSID {datapoint.dsid} not found. Model has not been trained. Error {str(e)}"
+            )
+            
         # TODO: what happens if the user asks for a model that was never trained?
         #       or if the user asks for a dsid without any data? 
         #       need a graceful failure for the client...
 
 
-    pred_label = app.clf.predict(data)
+    pred_label = app.sk_clf[datapoint.dsid].predict(data)
     return {"prediction":str(pred_label)}
 
 
