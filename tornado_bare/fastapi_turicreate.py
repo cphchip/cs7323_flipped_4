@@ -415,8 +415,8 @@ async def predict_datapoint_sklearn(datapoint: FeatureDataPoint = Body(...)):
     # Flipped Module 4 Update: Section 3 step 12 part 1 and 2
     # Updated to check if dsid exists, handle errors
     # if(app.clf == {}):
-    if datapoint.dsid not in app.clf: # new if statement
-        print("Loading Turi Model From file for DSID: ", datapoint.dsid)
+    if datapoint.dsid not in app.sk_clf: # new if statement
+        print("Loading sk Model From file for DSID: ", datapoint.dsid)
 
         try:
             # Try to set model equal to the correct model from the dictionary
